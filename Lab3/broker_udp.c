@@ -4,13 +4,13 @@
  * - Escucha en UDP port 5000 (por defecto).
  * - Recibe mensajes de tipo:
  *     SUB <topic>            -> registra al subscriber (por su addr)
- *     PUB <topic> <payload>  -> reenvía <payload> a todos los subscribers del <topic>
+ *     PUB <topic> <payload>  -> reenva <payload> a todos los subscribers del <topic>
  *
  * Uso:
  *   gcc broker_udp.c -o broker_udp
  *   ./broker_udp            # escucha en 0.0.0.0:5000
  *
- * Nota: no usa librerías externas, solo API POSIX sockets y select().
+ * Nota: no usa libreras externas, solo API POSIX sockets y select().
  */
 
 #include <stdio.h>
@@ -28,8 +28,8 @@
 #define MAX_TOPIC_LEN 128
 
 typedef struct {
-    struct sockaddr_in addr;   // dirección del subscriber
-    char topic[MAX_TOPIC_LEN]; // topic al que está suscrito
+    struct sockaddr_in addr;   // direccin del subscriber
+    char topic[MAX_TOPIC_LEN]; // topic al que est suscrito
     int used;
 } subscriber_t;
 
@@ -42,7 +42,7 @@ int same_addr(const struct sockaddr_in* a, const struct sockaddr_in* b) {
         (a->sin_port == b->sin_port);
 }
 
-/* Añade un subscriber (si no existe ya) */
+/* Aade un subscriber (si no existe ya) */
 void add_subscriber(const struct sockaddr_in* addr, const char* topic) {
     for (int i = 0; i < MAX_SUBSCRIBERS; ++i) {
         if (subscribers[i].used) {
@@ -65,10 +65,10 @@ void add_subscriber(const struct sockaddr_in* addr, const char* topic) {
             return;
         }
     }
-    fprintf(stderr, "[broker] Advertencia: lista de subscribers llena, no se puede agregar más.\n");
+    fprintf(stderr, "[broker] Advertencia: lista de subscribers llena, no se puede agregar ms.\n");
 }
 
-/* Envía payload a todos los subscribers del topic */
+/* Enva payload a todos los subscribers del topic */
 void forward_to_topic(int sockfd, const char* topic, const char* payload) {
     for (int i = 0; i < MAX_SUBSCRIBERS; ++i) {
         if (!subscribers[i].used) continue;
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
         FD_SET(sockfd, &readfds);
         maxfd = sockfd;
 
-        // opcionalmente podemos usar timeout para tareas periódicas; aquí bloqueamos hasta evento
+        // opcionalmente podemos usar timeout para tareas peridicas; aqu bloqueamos hasta evento
         tv.tv_sec = 5;
         tv.tv_usec = 0;
 
@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
             break;
         }
         else if (rv == 0) {
-            // timeout: no hay datos; continue (podríamos hacer limpieza periódica si fuera necesario)
+            // timeout: no hay datos; continue (podramos hacer limpieza peridica si fuera necesario)
             continue;
         }
 
@@ -156,16 +156,16 @@ int main(int argc, char* argv[]) {
                     add_subscriber(&src_addr, topic);
                 }
                 else {
-                    fprintf(stderr, "[broker] SUB inválido: '%s'\n", buf);
+                    fprintf(stderr, "[broker] SUB invlido: '%s'\n", buf);
                 }
             }
             else if (len >= 4 && strncmp(buf, "PUB ", 4) == 0) {
                 // PUB <topic> <payload...>
                 char topic[MAX_TOPIC_LEN];
-                // buscamos primer espacio después del topic
+                // buscamos primer espacio despus del topic
                 char* p = buf + 4;
                 if (sscanf(p, "%127s", topic) >= 1) {
-                    // Avanzamos p hasta después del topic
+                    // Avanzamos p hasta despus del topic
                     p += strlen(topic);
                     while (*p == ' ') p++;
                     const char* payload = p;
@@ -178,7 +178,7 @@ int main(int argc, char* argv[]) {
                     }
                 }
                 else {
-                    fprintf(stderr, "[broker] PUB inválido: '%s'\n", buf);
+                    fprintf(stderr, "[broker] PUB invlido: '%s'\n", buf);
                 }
             }
             else {
