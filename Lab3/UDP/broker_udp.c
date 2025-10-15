@@ -1,17 +1,7 @@
-/* broker_udp.c
- *
- * Broker UDP simple para un sistema publish-subscribe por topics.
- * - Escucha en UDP port 5000 (por defecto).
- * - Recibe mensajes de tipo:
- *     SUB <topic>            -> registra al subscriber (por su addr)
- *     PUB <topic> <payload>  -> reenva <payload> a todos los subscribers del <topic>
- *
- * Uso:
- *   gcc broker_udp.c -o broker_udp
- *   ./broker_udp            # escucha en 0.0.0.0:5000
- *
- * Nota: no usa libreras externas, solo API POSIX sockets y select().
- */
+
+// gcc broker_udp.c -o broker_udp
+//  ./broker_udp            # escucha en 0.0.0.0:5000
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,14 +25,14 @@ typedef struct {
 
 subscriber_t subscribers[MAX_SUBSCRIBERS];
 
-/* Compara dos sockaddr_in (ip y puerto) */
+// Compara dos sockaddr_in (ip y puerto) */
 int same_addr(const struct sockaddr_in* a, const struct sockaddr_in* b) {
     return (a->sin_family == b->sin_family) &&
         (a->sin_addr.s_addr == b->sin_addr.s_addr) &&
         (a->sin_port == b->sin_port);
 }
 
-/* Aade un subscriber (si no existe ya) */
+// Aade un subscriber (si no existe ya) */
 void add_subscriber(const struct sockaddr_in* addr, const char* topic) {
     for (int i = 0; i < MAX_SUBSCRIBERS; ++i) {
         if (subscribers[i].used) {
